@@ -9,9 +9,34 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.example.ayushvora.potholereporter.MainActivity">
-
-    <TextView
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:weightSum="1">
+        <TextView
+        android:id="@+id/WelcomeTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!" />
+        android:layout_gravity="center"
+        android:text="@string/WelcomeMsg"
+        android:layout_marginBottom="@dimen/activity_vertical_margin"    />
+        <ImageView
+            android:id="@+id/PotholeImageView"
+            android:layout_width="match_parent"
+            android:layout_height="167dp"
+            android:layout_gravity="center"
+            android:src="@drawable/fixmepothole"
+            android:layout_marginBottom="@dimen/activity_vertical_margin" />
+        <Button
+            android:id="@+id/ReportingButtonView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/StartMsg"
+            android:onClick="startSurvey"/>
+
+    </LinearLayout>
 </RelativeLayout>

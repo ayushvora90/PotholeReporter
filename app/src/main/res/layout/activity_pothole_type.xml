@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_pothole_type"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="com.example.ayushvora.potholereporter.PotholeTypeActivity">
+    <RelativeLayout
+        android:id="@+id/buttonBarRelLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true">
+        <LinearLayout
+            android:id="@+id/buttonBarLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="10dp"
+            android:weightSum="1">
+            <Button
+                android:id="@+id/PrevButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/Previous"
+                android:onClick="onPrevClick"
+                android:layout_marginLeft="15pt">
+            </Button>
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"/>
+            <Button
+                android:id="@+id/NextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:layout_marginRight="15pt"
+                android:onClick="onNextClick"
+                android:text="@string/Next">
+            </Button>
+        </LinearLayout>
+    </RelativeLayout>
+    <TextView
+        android:id="@+id/Question3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:textSize="13dip"
+        android:text="@string/Question3"
+        android:layout_marginBottom="@dimen/activity_vertical_margin"/>
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/Question3"
+        android:layout_above="@id/buttonBarRelLayout">
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="center_horizontal"
+                android:scrollbars="vertical"
+                android:weightSum="1">
+
+                <TextView
+                    android:id="@+id/EarlyStageTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/EarlyPothole"
+                    android:textAlignment="center"
+                    android:layout_gravity="center"
+                    />
+                <ImageView
+                    android:id="@+id/EarlyStageImageView"
+                    android:layout_width="200dp"
+                    android:layout_height="140dp"
+                    android:src="@drawable/earlypothole_rounded"
+                    android:clickable="true"
+                    android:onClick="onEarlyStageCLick"
+                    android:scaleType="fitCenter" />
+                <View style="@style/Divider"/>
+                <TextView
+                    android:id="@+id/CliffhangerTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/Cliffhanger"
+                    android:textAlignment="center"
+                    android:layout_gravity="center"
+                    />
+                <ImageView
+                    android:id="@+id/CliffhangerImageView"
+                    android:layout_width="200dp"
+                    android:layout_height="140dp"
+                    android:src="@drawable/cliffhanger_rounded"
+                    android:clickable="true"
+                    android:onClick="onCliffhangerClick"
+                    android:scaleType="fitCenter" />
+                <View style="@style/Divider"/>
+                <TextView
+                    android:id="@+id/InvertedTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/Inverted"
+                    android:textAlignment="center"
+                    android:layout_gravity="center"
+                    />
+                <ImageView
+                    android:id="@+id/InvertedImageView"
+                    android:layout_width="200dp"
+                    android:layout_height="140dp"
+                    android:src="@drawable/inverted_rounded"
+                    android:clickable="true"
+                    android:onClick="onInvertedClick"
+                    android:scaleType="fitCenter" />
+                <View style="@style/Divider"/>
+                <TextView
+                    android:id="@+id/TectonicTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/Tectonic"
+                    android:textAlignment="center"
+                    android:layout_gravity="center"
+                    />
+                <ImageView
+                    android:id="@+id/TectonicImageView"
+                    android:layout_width="200dp"
+                    android:layout_height="140dp"
+                    android:src="@drawable/tectonic_rounded"
+                    android:clickable="true"
+                    android:onClick="onTectonicClick"
+                    android:scaleType="fitCenter" />
+                <View style="@style/Divider"/>
+                <TextView
+                    android:id="@+id/TraditionalTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/Traditional"
+                    android:textAlignment="center"
+                    android:layout_gravity="center"
+                    />
+                <ImageView
+                    android:id="@+id/TraditionalImageView"
+                    android:layout_width="200dp"
+                    android:layout_height="140dp"
+                    android:src="@drawable/traditional_rounded"
+                    android:clickable="true"
+                    android:onClick="onTraditionalClick"
+                    android:scaleType="fitCenter" />
+
+        </LinearLayout>
+    </ScrollView>
+
+
+
+
+</RelativeLayout>

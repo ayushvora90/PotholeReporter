@@ -1,3 +1,19 @@
 <resources>
     <string name="app_name">PotholeReporter</string>
+    <string name="WelcomeMsg">Welcome to Pothole Reporter!</string>
+    <string name="StartMsg">Start Reporting</string>
+    <string name="Next">Next</string>
+    <string name="Previous">Prev</string>
+    <string name="DimensionalUnitMSq">m.sq</string>
+    <string name="DimensionalUnitCM">cm</string>
+    <string name="Question1">What are the approximate dimensions of the pothole?</string>
+    <string name="Question2">What is the depth of the pothole?</string>
+    <string name="Question3">What type does the pothole most closely resemble to?\n(Please scroll down till the bottom to see all options)</string>
+    <string name="EarlyPothole">Early-stage Pothole</string>
+    <string name="Cliffhanger">Cliffhanger Pothole</string>
+    <string name="Inverted">Inverted Pothole</string>
+    <string name="Tectonic">Tectonic Pothole</string>
+    <string name="Traditional">Traditional Pothole</string>
+    <string name="CapGeoTagPot">Capture &amp; GeoTag Pothole</string>
+    <string name="Submit">Submit</string>
 </resources>
