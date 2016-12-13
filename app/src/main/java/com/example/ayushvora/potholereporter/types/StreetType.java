@@ -20,10 +20,12 @@ public enum StreetType {
 
     public static double getValueWt(String streetType){
         if(streetType.equals(StreetType.ARTERIAL.toString())){
+            return StreetType.ARTERIAL.valueWt;
+        } else if(streetType.equals(StreetType.COMMERCIAL.toString())){
             return StreetType.COMMERCIAL.valueWt;
-        } else if(streetType.equals(TrafficVolume.HIGH.toString())){
+        } else if(streetType.equals(StreetType.RESIDENTIAL.toString())){
             return StreetType.RESIDENTIAL.valueWt;
-        } else if(streetType.equals(TrafficVolume.MEDIUM.toString())){
+        } else if(streetType.equals(StreetType.ALLEYWAY.toString())){
             return StreetType.ALLEYWAY.valueWt;
         } else {
             return 0;

@@ -1,14 +1,28 @@
 package com.example.ayushvora.potholereporter;
 
+import android.app.KeyguardManager;
 import android.app.ProgressDialog;
+import android.app.admin.DevicePolicyManager;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.hardware.camera2.CameraAccessException;
+import android.hardware.camera2.CameraManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
+import android.net.wifi.WifiConfiguration;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.nfc.Tag;
 import android.os.AsyncTask;
+import android.os.Build;
+import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.AbsListView;
@@ -24,6 +38,9 @@ import android.widget.Toast;
 
 import com.example.ayushvora.potholereporter.customadapters.CheckedTextAdapter;
 import com.example.ayushvora.potholereporter.models.SurveyQuestion;
+import com.example.ayushvora.potholereporter.ruleengines.PotholeDataQualityRuleEngine;
+import com.example.ayushvora.potholereporter.ruleengines.PotholeDataRuleEngine;
+import com.example.ayushvora.potholereporter.ruleengines.SecurityEvaluatorRuleEngine;
 import com.example.ayushvora.potholereporter.types.AverageSpeed;
 import com.example.ayushvora.potholereporter.types.CountyName;
 import com.example.ayushvora.potholereporter.types.JunctionType;
@@ -43,6 +60,8 @@ import org.w3c.dom.Text;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -57,8 +76,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 public class SurveyActivity extends AppCompatActivity {
+    public final static String PRIORITY = "com.example.ayushvora.potholereporter.PRIORITY";
+
     private HashMap<String,String> potholeDataMap;
     private int questionIndex;
     private String value;
@@ -69,6 +91,7 @@ public class SurveyActivity extends AppCompatActivity {
     private CheckedTextAdapter adapter;
     private ListView optionsListView;
     TextView questionTextView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Intent potholeTypeActivity = getIntent();
@@ -142,16 +165,136 @@ public class SurveyActivity extends AppCompatActivity {
     }
 
     public void onSubmitClick(View view){
+        double completenessRating = PotholeDataQualityRuleEngine.getCompletenessRating(potholeDataMap);
+        potholeDataMap.put("completenessRating", completenessRating+"");
+        double securityRating = evaluateSecurityRating();
+        potholeDataMap.put("securityRating",securityRating+"");
+        potholeDataMap.put("imageQuality","");
+        Bitmap imageBitmap = null;
+        try {
+            imageBitmap = (Bitmap) BitmapFactory.decodeStream(getContentResolver().openInputStream(Uri.parse(potholeDataMap.get("image"))));
+            int width = imageBitmap.getWidth();
+            int height = imageBitmap.getHeight();
+            long resolution = width*height;
+            double megaPixels = Math.ceil(resolution/Math.pow(10,6));
+            String imageQuality = PotholeDataQualityRuleEngine.getImageQualityString(megaPixels);
+            potholeDataMap.put("imageQuality",imageQuality);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            imageBitmap.compress(Bitmap.CompressFormat.JPEG, 90, baos);
+            String encodedImage ="";
+            byte[] photoByte = baos.toByteArray();
+            encodedImage = Base64.encodeToString(photoByte,Base64.DEFAULT);
+            potholeDataMap.put("image",encodedImage);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+
+
+        String result = null;
+        PotholeDataRuleEngine aruleEngine = new PotholeDataRuleEngine(potholeDataMap);
+        double priorityScore = aruleEngine.evaluate();
+        potholeDataMap.put("priorityScore",priorityScore+"");
+        String potholePriority = PotholeDataRuleEngine.getPriorityString(priorityScore);
+        potholeDataMap.put("priority",potholePriority);
+        double dataQualityScore = PotholeDataQualityRuleEngine.getDataQualityScore(potholeDataMap);
+        potholeDataMap.put("dataQualityScore", dataQualityScore+"");
+        Toast.makeText(this,potholePriority,Toast.LENGTH_LONG).show();
         ConnectivityManager connMgr = (ConnectivityManager)
                 getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
         if (networkInfo != null && networkInfo.isConnected()) {
-            new SavePotholeData().execute();
+
+            try {
+                result = new SavePotholeData().execute().get();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            }
         } else {
             Toast.makeText(this,"No network",Toast.LENGTH_SHORT);
         }
+        Intent nextIntent = new Intent(this,FinishActivity.class);
+        nextIntent.putExtra(PRIORITY,potholeDataMap.get("priority"));
+        startActivity(nextIntent);
 
+    }
 
+    private double evaluateSecurityRating() {
+        KeyguardManager km = (KeyguardManager)getSystemService(Context.KEYGUARD_SERVICE);
+        DevicePolicyManager dpm = (DevicePolicyManager) getSystemService(Context.DEVICE_POLICY_SERVICE);
+        SecurityEvaluatorRuleEngine sere = new SecurityEvaluatorRuleEngine();
+        int evaluationScore = 0;
+        boolean wifiWPAenabled = false;
+        WifiManager wifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+        WifiInfo wi = wifi.getConnectionInfo();
+        if( wi != null )
+        {
+            WifiConfiguration currConfig = null;
+            for( WifiConfiguration config : wifi.getConfiguredNetworks() )
+            {
+                if( config.status == WifiConfiguration.Status.CURRENT )
+                {
+                    currConfig = config;
+                    break;
+                }
+            }
+            if( currConfig != null )
+            {
+                wifiWPAenabled = currConfig.allowedKeyManagement.nextSetBit(0)!=WifiConfiguration.KeyMgmt.NONE;
+                sere.setWpaEnabled(wifiWPAenabled);
+            } else {
+                sere.setWpaEnabled(true);
+            }
+
+        }
+
+        if(Build.VERSION.SDK_INT>=23) {
+            sere.setScreenLockEnabled(km.isDeviceSecure());
+            if (km.isDeviceSecure()) {
+                sere.setAutoLockEnabled(Settings.Secure.getInt(getContentResolver(), "lock_screen_lock_after_timeout", 5000) <= 5000);
+            } else {
+                sere.setAutoLockEnabled(false);
+            }
+        } else {
+            sere.setScreenLockEnabled(km.isKeyguardSecure());
+            if (km.isKeyguardSecure()) {
+                sere.setAutoLockEnabled(Settings.Secure.getInt(getContentResolver(), "lock_screen_lock_after_timeout", 5000) <= 5000);
+            } else {
+                sere.setAutoLockEnabled(false);
+            }
+        }
+        if(Build.VERSION.SDK_INT>=17) {
+            sere.setDeveloperOptionsEnabled(Settings.Global.getInt(getContentResolver(), Settings.Global.DEVELOPMENT_SETTINGS_ENABLED, 0) == 1);
+        } else if(Build.VERSION.SDK_INT<17){
+            ContentResolver cr = getContentResolver();
+            try {
+                Settings.Secure.getInt(cr, Settings.Secure.DEVELOPMENT_SETTINGS_ENABLED);
+            } catch (Settings.SettingNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+        sere.setEncryptionEnabled(dpm.getStorageEncryptionStatus()==DevicePolicyManager.ENCRYPTION_STATUS_ACTIVE);
+        sere.setTpaEnabled(Settings.Secure.getInt(getContentResolver(), Settings.Secure.INSTALL_NON_MARKET_APPS,0)==1);
+        evaluationScore = sere.runEvaluation();
+        double securityRating = 0;
+
+        if (evaluationScore >= 8 && evaluationScore<=10){
+            return securityRating = 100;
+        }
+        else if(evaluationScore >= 5 && evaluationScore<=7){
+            return securityRating = 80;
+        }
+        else if(evaluationScore >= 2 && evaluationScore<=4){
+            return securityRating = 60;
+        }
+        else if(evaluationScore >= -2 && evaluationScore<=1){
+            return securityRating = 40;
+        }
+        else {
+            return securityRating = 20;
+        }
     }
 
     private View getViewByPosition(int pos, ListView listView) {
@@ -199,14 +342,13 @@ public class SurveyActivity extends AppCompatActivity {
          * Creating product
          * */
         protected String doInBackground(String... args) {
-            potholeDataMap.put("priority","HIGH");
             JSONObject request = new JSONObject(potholeDataMap);
             HttpURLConnection client = null;
             String response ="";
             OutputStream outputStream = null;
             try {
 //                Connect
-                client = (HttpURLConnection) ((new URL("http://192.168.0.101/capstone/receivedata.php").openConnection()));
+                client = (HttpURLConnection) ((new URL("http://129.21.94.158//capstone/receivedata.php").openConnection()));
 //                urlConnection.setDoOutput(true);
 //                urlConnection.setRequestProperty("Content-Type", "application/json");
 //                urlConnection.setRequestProperty("Accept", "application/json");
@@ -258,7 +400,7 @@ public class SurveyActivity extends AppCompatActivity {
                 while ((line = reader.readLine()) != null) {
                     result.append(line);
                 }
-                Log.d("doInBackground(Resp)", result.toString());
+                Log.i("doInBackground(Resp)", result.toString());
                 response = result.toString();
             } catch (IOException e) {
                 e.printStackTrace();

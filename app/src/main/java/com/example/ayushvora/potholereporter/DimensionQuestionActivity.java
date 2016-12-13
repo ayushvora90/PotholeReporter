@@ -32,9 +32,9 @@ public class DimensionQuestionActivity extends AppCompatActivity {
         widthPicker.setMaxValue(12);
         widthPicker.setMinValue(0);
         widthPicker.setValue(2);
-        depthPicker.setMaxValue(150);
+        depthPicker.setMaxValue(20);
         depthPicker.setMinValue(0);
-        depthPicker.setValue(10);
+        depthPicker.setValue(5);
     }
 
     public void onNextClick(View view) {

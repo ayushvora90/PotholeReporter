@@ -5,7 +5,7 @@ package com.example.ayushvora.potholereporter.types;
  */
 
 public enum WeatherType {
-    SUNNY("Sunny",0.50),WINDY("Windy",0.75),RAINY("Rainy",0.25),SNOWY("Snowy",1.00);
+    SUNNY("Sunny",0.25),WINDY("Windy",0.50),RAINY("Rainy",0.75),SNOWY("Snowy",1.00);
     private String weather;
     private double valueWt;
     WeatherType(String weather, double valueWt){

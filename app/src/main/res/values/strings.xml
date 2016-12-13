@@ -4,7 +4,7 @@
     <string name="StartMsg">Start Reporting</string>
     <string name="Next">Next</string>
     <string name="Previous">Prev</string>
-    <string name="DimensionalUnitMSq">m.sq</string>
+    <string name="DimensionalUnitMSq">ft.sq</string>
     <string name="DimensionalUnitCM">cm</string>
     <string name="Question1">What are the approximate dimensions of the pothole?</string>
     <string name="Question2">What is the depth of the pothole?</string>
