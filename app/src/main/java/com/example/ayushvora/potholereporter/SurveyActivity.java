@@ -118,10 +118,6 @@ public class SurveyActivity extends AppCompatActivity {
 
     }
 
-//    @Override
-//    protected  void onResume(){
-//        populateListView();
-//    }
 
     public void onNextClick(View view){
         SurveyQuestion currentQuestion  = surveyQuestionArrayList.get(questionIndex);
@@ -278,36 +274,24 @@ public class SurveyActivity extends AppCompatActivity {
         sere.setEncryptionEnabled(dpm.getStorageEncryptionStatus()==DevicePolicyManager.ENCRYPTION_STATUS_ACTIVE);
         sere.setTpaEnabled(Settings.Secure.getInt(getContentResolver(), Settings.Secure.INSTALL_NON_MARKET_APPS,0)==1);
         evaluationScore = sere.runEvaluation();
-        double securityRating = 0;
 
         if (evaluationScore >= 8 && evaluationScore<=10){
-            return securityRating = 100;
+            return 100;
         }
         else if(evaluationScore >= 5 && evaluationScore<=7){
-            return securityRating = 80;
+            return 80;
         }
         else if(evaluationScore >= 2 && evaluationScore<=4){
-            return securityRating = 60;
+            return 60;
         }
         else if(evaluationScore >= -2 && evaluationScore<=1){
-            return securityRating = 40;
+            return 40;
         }
         else {
-            return securityRating = 20;
+            return 20;
         }
     }
 
-    private View getViewByPosition(int pos, ListView listView) {
-        final int firstListItemPosition = listView.getFirstVisiblePosition();
-        final int lastListItemPosition = firstListItemPosition + listView.getChildCount() - 1;
-
-        if (pos < firstListItemPosition || pos > lastListItemPosition ) {
-            return listView.getAdapter().getView(pos, null, listView);
-        } else {
-            final int childIndex = pos - firstListItemPosition;
-            return listView.getChildAt(childIndex);
-        }
-    }
 
     private void populateListView() {
         adapter = new CheckedTextAdapter(this,surveyQuestionArrayList.get(questionIndex).getOptions(),questionValPosMap,questionIndex);
@@ -335,7 +319,7 @@ public class SurveyActivity extends AppCompatActivity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            Toast.makeText(getApplicationContext(),"Saving Data",Toast.LENGTH_SHORT);
+            Toast.makeText(getApplicationContext(),"Saving Data",Toast.LENGTH_SHORT).show();
         }
 
         /**
@@ -349,39 +333,12 @@ public class SurveyActivity extends AppCompatActivity {
             try {
 //                Connect
                 client = (HttpURLConnection) ((new URL("http://129.21.94.158//capstone/receivedata.php").openConnection()));
-//                urlConnection.setDoOutput(true);
-//                urlConnection.setRequestProperty("Content-Type", "application/json");
-//                urlConnection.setRequestProperty("Accept", "application/json");
-//                urlConnection.setRequestMethod("POST");
-//                urlConnection.connect();
-//
-//                //Write
-//                outputStream = new BufferedOutputStream(urlConnection.getOutputStream());
-//
-//
-//                outputStream.write(potholeObject.toString().getBytes());
-//                outputStream.flush();
-//
-//
-//                //Read
-//                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream(), "UTF-8"));
-//
-//                String line = null;
-//                StringBuilder sb = new StringBuilder();
-//
-//                while ((line = bufferedReader.readLine()) != null) {
-//                    sb.append(line);
-//                }
-//
-//                bufferedReader.close();
-//                result = sb.toString();
 
 
                 client.setDoOutput(true);
                 client.setDoInput(true);
                 client.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
                 client.setRequestMethod("POST");
-                //client.setFixedLengthStreamingMode(request.toString().getBytes("UTF-8").length);
                 client.connect();
 
                 Log.d("doInBackground(Request)", request.toString());
@@ -416,7 +373,7 @@ public class SurveyActivity extends AppCompatActivity {
          * After completing background task Dismiss the progress dialog
          * **/
         protected void onPostExecute(String file_url) {
-            Toast.makeText(getApplicationContext(),"Request Sent",Toast.LENGTH_SHORT);
+            Toast.makeText(getApplicationContext(),"Request Sent",Toast.LENGTH_SHORT).show();
         }
 
     }

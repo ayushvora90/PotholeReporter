@@ -134,15 +134,6 @@ public class PotholePictureLocationActivity extends AppCompatActivity implements
         }
     }
 
-//    private String pathFromUri(Uri imageUri) {
-//        String[] filePathColumn = { MediaStore.Images.Media.DATA };
-//        Cursor cursor = getContentResolver().query(imageUri, filePathColumn,
-//                null, null, null);
-//        cursor.moveToFirst();
-//        int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-//        String filePath = cursor.getString(columnIndex);
-//        return filePath ;
-//    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
